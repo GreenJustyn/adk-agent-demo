@@ -98,7 +98,7 @@ fi
 CR_ENV="GOOGLE_CLOUD_PROJECT=$PROJECT_ID,GOOGLE_CLOUD_LOCATION=us-central1,AGENT_MODEL=$AGENT_MODEL,AGENT_MODEL_LITE=$AGENT_MODEL_LITE,ADK_ENABLE_MCP_GRACEFUL_ERROR_HANDLING=1,TARGET_PROJECT_ID=$TARGET_PROJECT_ID,DATASET_ID=$DATASET_ID"
 gcloud run deploy "$SERVICE_NAME" \
     --image "$IMAGE_URI" --platform managed --region us-central1 --memory "4Gi" --cpu 2 \
-    --no-cpu-throttling --cpu-boost --no-allow-unauthenticated --ingress internal \
+    --no-cpu-throttling --cpu-boost --no-allow-unauthenticated --ingress all \
     --timeout 900 --service-account "$COMPUTE_SA" --set-env-vars="$CR_ENV" --quiet
 
 SERVICE_URL=$(gcloud run services list --filter="metadata.name:$SERVICE_NAME" --format="value(status.url)" | head -n 1)
