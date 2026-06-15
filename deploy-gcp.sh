@@ -11,7 +11,8 @@ AGENT_MODEL="gemini-2.5-pro"
 AGENT_MODEL_LITE="gemini-2.5-flash"
 
 # BigQuery telemetry dataset configuration
-DATASET_ID="melt_data_foundation_v04"
+#DATASET_ID="melt_data_foundation_v04"
+DATASET_ID="gemini_onenz_agent_demo"
 
 # Target GCP Project where the BigQuery dataset resides (falls back to active gcloud project if empty)
 TARGET_PROJECT_ID=""
