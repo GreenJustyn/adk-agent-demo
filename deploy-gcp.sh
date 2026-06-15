@@ -67,12 +67,12 @@ gcloud beta services identity create --service=discoveryengine.googleapis.com --
 COMPUTE_SA="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
 echo "🔐 Granting necessary IAM roles to Cloud Run service account ($COMPUTE_SA)..."
 for role in "roles/mcp.toolUser" "roles/serviceusage.serviceUsageConsumer" "roles/bigquery.jobUser" "roles/bigquery.dataViewer" "roles/aiplatform.user" "roles/run.invoker"; do
-  gcloud projects add-iam-policy-binding "$PROJECT_ID" --member="serviceAccount:$COMPUTE_SA" --role="$role" --condition=None --quiet >/dev/null 2>&1 || true
+  gcloud projects add-iam-policy-binding "$PROJECT_ID" --member="serviceAccount:$COMPUTE_SA" --role="$role" --quiet >/dev/null 2>&1 || true
 done
 
 DISCOVERY_ENGINE_SA="service-${PROJECT_NUMBER}@gcp-sa-discoveryengine.iam.gserviceaccount.com"
 echo "🔐 Granting run.invoker to Discovery Engine Service Agent ($DISCOVERY_ENGINE_SA)..."
-gcloud projects add-iam-policy-binding "$PROJECT_ID" --member="serviceAccount:$DISCOVERY_ENGINE_SA" --role="roles/run.invoker" --condition=None --quiet >/dev/null 2>&1 || true
+gcloud projects add-iam-policy-binding "$PROJECT_ID" --member="serviceAccount:$DISCOVERY_ENGINE_SA" --role="roles/run.invoker" --quiet >/dev/null 2>&1 || true
 
 echo "⏳ Pausing for 15 seconds to allow IAM role propagation across Google Cloud metadata systems..."
 sleep 15
@@ -108,6 +108,14 @@ gcloud run services update "$SERVICE_NAME" \
     --update-env-vars="AGENT_URL=$SERVICE_URL" \
     --region us-central1 \
     --quiet
+
+echo "🔐 Authorizing Discovery Engine to invoke the Cloud Run service..."
+gcloud run services add-iam-policy-binding "$SERVICE_NAME" \
+    --member="serviceAccount:$DISCOVERY_ENGINE_SA" \
+    --role="roles/run.invoker" \
+    --region=us-central1 \
+    --quiet >/dev/null 2>&1 || true
+
 echo "✅ Cloud Run service deployed successfully at: $SERVICE_URL"
 
 echo "🤖 Registering Agent definition to Gemini Enterprise..."
