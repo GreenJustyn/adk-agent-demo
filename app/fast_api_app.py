@@ -100,10 +100,15 @@ A2A_RPC_PATH = f"/a2a/{adk_app.name}"
 
 def _build_static_agent_card() -> AgentCard:
     from a2a.types import AgentSkill
+    agent_url = os.getenv("AGENT_URL")
+    if not agent_url:
+        agent_url = f"http://0.0.0.0:8080{A2A_RPC_PATH}"
+    elif not agent_url.endswith(A2A_RPC_PATH):
+        agent_url = agent_url.rstrip("/") + A2A_RPC_PATH
     return AgentCard(
         name=adk_app.name,
-        description="Claims Processing Investigation Agent",
-        url=f"http://0.0.0.0:8080{A2A_RPC_PATH}",
+        description="Demo ADK Agent",
+        url=agent_url,
         version="1.0.0",
         capabilities=AgentCapabilities(streaming=True, pushNotifications=True),
         defaultInputModes=["text/plain"],
@@ -125,7 +130,7 @@ async def lifespan(app_instance: FastAPI):
     yield
     logger.info("FastAPI lifespan shutdown.")
 
-app = FastAPI(title="claims-processing-investigation-agent", lifespan=lifespan)
+app = FastAPI(title="demo-adk-agent", lifespan=lifespan)
 
 class TokenMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):

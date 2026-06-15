@@ -102,6 +102,12 @@ gcloud run deploy "$SERVICE_NAME" \
     --timeout 900 --service-account "$COMPUTE_SA" --set-env-vars="$CR_ENV" --quiet
 
 SERVICE_URL=$(gcloud run services list --filter="metadata.name:$SERVICE_NAME" --format="value(status.url)" | head -n 1)
+
+echo "🔒 Injecting AGENT_URL environment variable to Cloud Run..."
+gcloud run services update "$SERVICE_NAME" \
+    --update-env-vars="AGENT_URL=$SERVICE_URL" \
+    --region us-central1 \
+    --quiet
 echo "✅ Cloud Run service deployed successfully at: $SERVICE_URL"
 
 echo "🤖 Registering Agent definition to Gemini Enterprise..."
